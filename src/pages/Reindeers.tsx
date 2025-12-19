@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { MapPin, Battery, Activity } from 'lucide-react';
+import { MapPin, Battery, Zap } from 'lucide-react';
 import { api, Reindeer } from '@/services/api';
-import StatusBadge from '@/components/StatusBadge';
+import { cn } from '@/lib/utils';
 
 const Reindeers = () => {
   const [reindeers, setReindeers] = useState<Reindeer[]>([]);
@@ -23,26 +23,20 @@ const Reindeers = () => {
     flying: reindeers.filter(r => r.status === 'flying').length,
   };
 
-  const reindeerEmojis: { [key: string]: string } = {
-    Rudolph: '🔴',
-    Dasher: '⚡',
-    Dancer: '💃',
-    Prancer: '🎪',
-    Vixen: '🦊',
-    Comet: '☄️',
-    Cupid: '💕',
-    Donner: '🌩️',
-    Blitzen: '⚡',
+  const statusConfig = {
+    resting: { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Resting' },
+    training: { color: 'text-accent', bg: 'bg-accent/10', label: 'Training' },
+    flying: { color: 'text-nice', bg: 'bg-nice/10', label: 'Flying' },
   };
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="skeleton h-8 w-48" />
-        <div className="skeleton h-64" />
+        <div className="skeleton h-6 w-40" />
+        <div className="skeleton h-48 rounded-xl" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(9)].map((_, i) => (
-            <div key={i} className="skeleton h-48" />
+            <div key={i} className="skeleton h-32 rounded-xl" />
           ))}
         </div>
       </div>
@@ -53,129 +47,130 @@ const Reindeers = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-display font-bold text-foreground flex items-center gap-2">
-          <span className="text-4xl animate-bounce-gentle">🦌</span>
-          Reindeer Tracker
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Monitor reindeer status and locations in real-time
+        <h1 className="text-xl font-semibold text-foreground">Reindeer Fleet</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          {reindeers.length} reindeers in the team
         </p>
       </div>
 
       {/* Map Placeholder */}
-      <div className="relative rounded-2xl bg-gradient-forest overflow-hidden h-64 card-hover animate-fade-in">
+      <div className="relative rounded-xl bg-secondary overflow-hidden h-48 animate-fade-in">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-secondary-foreground">
-            <div className="text-6xl mb-4">🗺️</div>
-            <h3 className="text-xl font-semibold">North Pole Operations Map</h3>
-            <p className="text-secondary-foreground/80 mt-1">Real-time tracking enabled</p>
+            <div className="text-4xl mb-2">🗺️</div>
+            <h3 className="text-sm font-medium">North Pole Operations</h3>
+            <p className="text-xs opacity-70 mt-0.5">Real-time tracking</p>
           </div>
         </div>
         
-        {/* Animated dots representing flying reindeers */}
-        {reindeers.filter(r => r.status === 'flying').map((reindeer, i) => (
+        {/* Flying indicators */}
+        {reindeers.filter(r => r.status === 'flying').map((_, i) => (
           <div
-            key={reindeer.id}
-            className="absolute h-4 w-4 rounded-full bg-accent animate-ping"
+            key={i}
+            className="absolute h-2 w-2 rounded-full bg-nice animate-pulse-soft"
             style={{
-              top: `${30 + i * 15}%`,
-              left: `${40 + i * 10}%`,
+              top: `${35 + i * 12}%`,
+              left: `${45 + i * 8}%`,
             }}
           />
         ))}
       </div>
 
       {/* Status Summary */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-xl bg-muted/50 border border-border p-4 text-center card-hover">
-          <p className="text-2xl font-bold text-foreground">{statusCounts.resting}</p>
-          <p className="text-sm text-muted-foreground">😴 Resting</p>
-        </div>
-        <div className="rounded-xl bg-accent/10 border border-accent/20 p-4 text-center card-hover">
-          <p className="text-2xl font-bold text-accent">{statusCounts.training}</p>
-          <p className="text-sm text-accent/80">🏃 Training</p>
-        </div>
-        <div className="rounded-xl bg-nice/10 border border-nice/20 p-4 text-center card-hover">
-          <p className="text-2xl font-bold text-nice">{statusCounts.flying}</p>
-          <p className="text-sm text-nice/80">✈️ Flying</p>
-        </div>
+      <div className="grid grid-cols-3 gap-3">
+        {Object.entries(statusConfig).map(([status, config]) => (
+          <div 
+            key={status}
+            className={cn("rounded-lg p-4 text-center", config.bg)}
+          >
+            <p className={cn("text-xl font-semibold", config.color)}>
+              {statusCounts[status as keyof typeof statusCounts]}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">{config.label}</p>
+          </div>
+        ))}
       </div>
 
       {/* Reindeer Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {reindeers.map((reindeer, index) => (
-          <div 
-            key={reindeer.id} 
-            className={`rounded-2xl bg-card border border-border p-6 card-hover animate-fade-in ${
-              reindeer.name === 'Rudolph' ? 'ring-2 ring-primary' : ''
-            }`}
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className={`h-14 w-14 rounded-2xl flex items-center justify-center text-3xl ${
-                  reindeer.name === 'Rudolph' 
-                    ? 'bg-gradient-christmas' 
-                    : 'bg-gradient-forest'
-                }`}>
-                  {reindeerEmojis[reindeer.name] || '🦌'}
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {reindeers.map((reindeer, index) => {
+          const config = statusConfig[reindeer.status];
+          const isLeader = reindeer.name === 'Rudolph';
+          
+          return (
+            <div 
+              key={reindeer.id} 
+              className={cn(
+                "rounded-xl bg-card border p-4 animate-fade-in",
+                isLeader ? 'border-primary' : 'border-border'
+              )}
+              style={{ animationDelay: `${index * 30}ms` }}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className={cn(
+                    "h-9 w-9 rounded-lg flex items-center justify-center text-lg",
+                    isLeader ? 'bg-primary/10' : 'bg-secondary/10'
+                  )}>
+                    {isLeader ? '🔴' : '🦌'}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                      {reindeer.name}
+                      {isLeader && (
+                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                          Leader
+                        </span>
+                      )}
+                    </h3>
+                    <span className={cn("text-[10px] font-medium", config.color)}>
+                      {config.label}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-foreground flex items-center gap-2">
-                    {reindeer.name}
-                    {reindeer.name === 'Rudolph' && (
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">Leader</span>
-                    )}
-                  </h3>
-                  <StatusBadge status={reindeer.status} />
+                {reindeer.status === 'flying' && (
+                  <Zap className="h-4 w-4 text-nice animate-pulse-soft" />
+                )}
+              </div>
+
+              {/* Location */}
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+                <MapPin className="h-3 w-3" />
+                <span>{reindeer.location}</span>
+              </div>
+
+              {/* Energy Level */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <Battery className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-muted-foreground">Energy</span>
+                  </div>
+                  <span className={cn(
+                    "font-medium",
+                    reindeer.energyLevel >= 80 ? 'text-nice' : 
+                    reindeer.energyLevel >= 50 ? 'text-accent' : 'text-naughty'
+                  )}>
+                    {reindeer.energyLevel}%
+                  </span>
+                </div>
+                <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ 
+                      width: `${reindeer.energyLevel}%`,
+                      backgroundColor: reindeer.energyLevel >= 80 
+                        ? 'hsl(var(--nice))' 
+                        : reindeer.energyLevel >= 50 
+                        ? 'hsl(var(--accent))' 
+                        : 'hsl(var(--naughty))'
+                    }}
+                  />
                 </div>
               </div>
             </div>
-
-            {/* Location */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-              <MapPin className="h-4 w-4" />
-              <span>{reindeer.location}</span>
-            </div>
-
-            {/* Energy Level */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <Battery className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Energy Level</span>
-                </div>
-                <span className={`font-semibold ${
-                  reindeer.energyLevel >= 80 ? 'text-nice' : 
-                  reindeer.energyLevel >= 50 ? 'text-accent' : 'text-naughty'
-                }`}>
-                  {reindeer.energyLevel}%
-                </span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                <div 
-                  className="h-full rounded-full transition-all duration-1000 progress-animate"
-                  style={{ 
-                    width: `${reindeer.energyLevel}%`,
-                    backgroundColor: reindeer.energyLevel >= 80 
-                      ? 'hsl(var(--nice))' 
-                      : reindeer.energyLevel >= 50 
-                      ? 'hsl(var(--accent))' 
-                      : 'hsl(var(--naughty))'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Activity Indicator */}
-            {reindeer.status === 'flying' && (
-              <div className="mt-4 flex items-center gap-2 text-nice">
-                <Activity className="h-4 w-4 animate-pulse" />
-                <span className="text-sm font-medium">Currently Active</span>
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

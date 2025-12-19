@@ -2,112 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SantaCloud Design System - Christmas Magic ✨ */
+/* SantaCloud Design System - Modern Christmas */
 
 @layer base {
   :root {
-    /* Core Christmas Palette */
-    --background: 210 40% 98%;
-    --foreground: 150 50% 10%;
+    /* Clean, modern palette with Christmas warmth */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 150 50% 10%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 50% 10%;
+    --popover-foreground: 0 0% 9%;
 
     /* Christmas Red - Primary */
-    --primary: 0 76% 42%;
+    --primary: 0 72% 51%;
     --primary-foreground: 0 0% 100%;
 
     /* Forest Green - Secondary */
-    --secondary: 144 61% 20%;
+    --secondary: 152 55% 33%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Muted Snow */
-    --muted: 210 20% 94%;
-    --muted-foreground: 150 10% 40%;
+    /* Neutral */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
     /* Gold Accent */
-    --accent: 38 92% 50%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 36 100% 50%;
+    --accent-foreground: 0 0% 9%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Nice Green */
-    --nice: 142 76% 36%;
+    --nice: 152 55% 40%;
     --nice-foreground: 0 0% 100%;
 
     /* Naughty Red */
-    --naughty: 0 84% 50%;
+    --naughty: 0 72% 51%;
     --naughty-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 0 76% 42%;
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
+    --ring: 0 72% 51%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    /* Gradients */
-    --gradient-polar: linear-gradient(180deg, hsl(210 40% 98%) 0%, hsl(220 30% 92%) 100%);
-    --gradient-aurora: linear-gradient(135deg, hsl(210 50% 95%) 0%, hsl(180 30% 92%) 50%, hsl(220 40% 90%) 100%);
-    --gradient-christmas: linear-gradient(135deg, hsl(0 76% 42%) 0%, hsl(0 76% 35%) 100%);
-    --gradient-forest: linear-gradient(135deg, hsl(144 61% 20%) 0%, hsl(144 61% 15%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(45 93% 47%) 100%);
-
-    /* Shadows */
-    --shadow-soft: 0 4px 20px -2px hsl(0 0% 0% / 0.08);
-    --shadow-card: 0 8px 30px -4px hsl(0 0% 0% / 0.1);
-    --shadow-glow-red: 0 0 30px hsl(0 76% 42% / 0.3);
-    --shadow-glow-gold: 0 0 30px hsl(38 92% 50% / 0.3);
-
-    /* Sidebar */
-    --sidebar-background: 144 61% 12%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 76% 50%;
+    /* Sidebar - Dark elegant green */
+    --sidebar-background: 152 40% 15%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 72% 51%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 144 50% 18%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 144 40% 20%;
-    --sidebar-ring: 0 76% 50%;
+    --sidebar-accent: 152 30% 22%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 152 30% 25%;
+    --sidebar-ring: 0 72% 51%;
   }
 
   .dark {
-    --background: 220 30% 8%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 95%;
 
-    --card: 220 30% 12%;
+    --card: 0 0% 10%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 220 30% 12%;
+    --popover: 0 0% 10%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 0 76% 50%;
+    --primary: 0 72% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 144 50% 25%;
+    --secondary: 152 50% 35%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 210 20% 65%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 38 92% 50%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 36 100% 50%;
+    --accent-foreground: 0 0% 9%;
 
-    --nice: 142 76% 40%;
+    --nice: 152 55% 45%;
     --nice-foreground: 0 0% 100%;
 
-    --naughty: 0 84% 55%;
+    --naughty: 0 72% 55%;
     --naughty-foreground: 0 0% 100%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 0 76% 50%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 72% 55%;
 
-    --sidebar-background: 220 30% 6%;
+    --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-accent: 220 30% 12%;
+    --sidebar-accent: 0 0% 12%;
   }
 }
 
@@ -118,13 +105,12 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    background: var(--gradient-aurora);
-    min-height: 100vh;
+    font-feature-settings: "cv11", "ss01";
   }
 }
 
 @layer components {
-  /* Snow Animation */
+  /* Subtle Snow Animation */
   .snow-container {
     position: fixed;
     top: 0;
@@ -139,45 +125,41 @@
   .snowflake {
     position: absolute;
     top: -10px;
-    color: hsl(210 40% 85%);
-    font-size: 1rem;
+    color: hsl(0 0% 85%);
+    font-size: 0.75rem;
     animation: fall linear infinite;
-    opacity: 0.8;
+    opacity: 0.4;
   }
 
   @keyframes fall {
     0% {
       transform: translateY(-10px) rotate(0deg);
-      opacity: 1;
+      opacity: 0.4;
     }
     100% {
-      transform: translateY(100vh) rotate(360deg);
-      opacity: 0.3;
+      transform: translateY(100vh) rotate(180deg);
+      opacity: 0;
     }
   }
 
-  /* Card Animations */
+  /* Minimal skeleton */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded-lg;
+  }
+
+  /* Modern Card Hover */
   .card-hover {
-    @apply transition-all duration-300 ease-out;
+    @apply transition-all duration-200 ease-out;
   }
 
   .card-hover:hover {
-    @apply -translate-y-1;
-    box-shadow: var(--shadow-card);
-  }
-
-  /* Glow Effects */
-  .glow-red {
-    box-shadow: var(--shadow-glow-red);
-  }
-
-  .glow-gold {
-    box-shadow: var(--shadow-glow-gold);
+    @apply shadow-lg;
+    transform: translateY(-2px);
   }
 
   /* Progress Bar Animation */
   .progress-animate {
-    animation: progress-fill 1.5s ease-out forwards;
+    animation: progress-fill 0.8s ease-out forwards;
   }
 
   @keyframes progress-fill {
@@ -185,103 +167,10 @@
       width: 0%;
     }
   }
-
-  /* Skeleton Loader */
-  .skeleton {
-    @apply animate-pulse bg-muted rounded-lg;
-  }
-
-  /* Badge Styles */
-  .badge-nice {
-    @apply bg-nice text-nice-foreground;
-  }
-
-  .badge-naughty {
-    @apply bg-naughty text-naughty-foreground;
-  }
-
-  /* Festive Button Variants */
-  .btn-christmas {
-    background: var(--gradient-christmas);
-    @apply text-primary-foreground shadow-lg transition-all duration-300;
-  }
-
-  .btn-christmas:hover {
-    @apply -translate-y-0.5;
-    box-shadow: var(--shadow-glow-red);
-  }
-
-  .btn-forest {
-    background: var(--gradient-forest);
-    @apply text-secondary-foreground shadow-lg transition-all duration-300;
-  }
-
-  .btn-gold {
-    background: var(--gradient-gold);
-    @apply text-accent-foreground shadow-lg transition-all duration-300;
-  }
-
-  .btn-gold:hover {
-    box-shadow: var(--shadow-glow-gold);
-  }
-
-  /* Floating Animation */
-  .float {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  /* Sparkle Effect */
-  .sparkle {
-    animation: sparkle 2s ease-in-out infinite;
-  }
-
-  @keyframes sparkle {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
 }
 
 @layer utilities {
-  .text-gradient-christmas {
-    @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-christmas);
-  }
-
-  .text-gradient-gold {
-    @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-gold);
-  }
-
-  .bg-gradient-polar {
-    background: var(--gradient-polar);
-  }
-
-  .bg-gradient-aurora {
-    background: var(--gradient-aurora);
-  }
-
-  .bg-gradient-christmas {
-    background: var(--gradient-christmas);
-  }
-
-  .bg-gradient-forest {
-    background: var(--gradient-forest);
-  }
-
-  .bg-gradient-gold {
-    background: var(--gradient-gold);
+  .text-balance {
+    text-wrap: balance;
   }
 }

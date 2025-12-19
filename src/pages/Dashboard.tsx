@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Users, Gift, CircleDot, Mail, TrendingUp, Sparkles } from 'lucide-react';
+import { Users, Gift, CircleDot, Mail, ArrowUpRight } from 'lucide-react';
 import { api, DashboardStats } from '@/services/api';
 import StatsCard from '@/components/StatsCard';
-import ProgressChart from '@/components/ProgressChart';
 
 const Dashboard = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -26,43 +25,36 @@ const Dashboard = () => {
   if (isLoading || !stats) {
     return (
       <div className="space-y-6">
-        <div className="skeleton h-8 w-48" />
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="skeleton h-6 w-32" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="skeleton h-32" />
+            <div key={i} className="skeleton h-24 rounded-xl" />
           ))}
         </div>
       </div>
     );
   }
 
+  const totalGifts = giftProgress.reduce((acc, item) => acc + item.value, 0);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-foreground flex items-center gap-2">
-            <Sparkles className="h-8 w-8 text-accent animate-sparkle" />
-            Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Welcome back, Santa! Here's your Christmas overview.
-          </p>
-        </div>
-        <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-nice/10 border border-nice/20">
-          <TrendingUp className="h-4 w-4 text-nice" />
-          <span className="text-sm font-medium text-nice">On track for Christmas!</span>
-        </div>
+      <div>
+        <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Overview of your Christmas operations
+        </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Children"
           value={stats.totalChildren.toLocaleString()}
           icon={Users}
           trend={{ value: 12, positive: true }}
-          variant="christmas"
+          variant="primary"
           delay={0}
         />
         <StatsCard
@@ -70,93 +62,103 @@ const Dashboard = () => {
           value={stats.niceChildren.toLocaleString()}
           icon={Users}
           trend={{ value: 8, positive: true }}
-          variant="forest"
-          delay={100}
+          variant="secondary"
+          delay={50}
         />
         <StatsCard
           title="Gifts Ready"
           value={stats.giftsReady.toLocaleString()}
           icon={Gift}
-          trend={{ value: 15, positive: true }}
-          variant="gold"
-          delay={200}
+          variant="accent"
+          delay={100}
         />
         <StatsCard
           title="Active Reindeers"
           value={stats.activeReindeers}
           icon={CircleDot}
           variant="default"
-          delay={300}
+          delay={150}
         />
       </div>
 
-      {/* Charts Section */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <ProgressChart
-          title="Gift Production Progress"
-          data={giftProgress}
-        />
+      {/* Content Grid */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Gift Progress */}
+        <div className="lg:col-span-2 rounded-xl bg-card border border-border p-5 animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <h3 className="text-sm font-medium text-foreground mb-4">Gift Production</h3>
+          <div className="space-y-3">
+            {giftProgress.map((item) => (
+              <div key={item.label} className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{item.label}</span>
+                  <span className="font-medium text-foreground">{item.value}</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-700 progress-animate"
+                    style={{ 
+                      width: `${(item.value / totalGifts) * 100}%`,
+                      backgroundColor: item.color
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
         
         {/* Quick Stats */}
-        <div className="rounded-2xl bg-card border border-border p-6 card-hover animate-fade-in" style={{ animationDelay: '400ms' }}>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Quick Overview</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-naughty/10 flex items-center justify-center">
-                  <span className="text-lg">😈</span>
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Naughty List</p>
-                  <p className="text-sm text-muted-foreground">Need behavior improvement</p>
-                </div>
+        <div className="rounded-xl bg-card border border-border p-5 animate-fade-in" style={{ animationDelay: '250ms' }}>
+          <h3 className="text-sm font-medium text-foreground mb-4">Alerts</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-naughty/5 border border-naughty/10">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-naughty" />
+                <span className="text-sm text-foreground">Naughty list</span>
               </div>
-              <span className="text-2xl font-bold text-naughty">{stats.naughtyChildren}</span>
+              <span className="text-sm font-semibold text-naughty">{stats.naughtyChildren}</span>
             </div>
             
-            <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
-                  <span className="text-lg">🔧</span>
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Gifts In Progress</p>
-                  <p className="text-sm text-muted-foreground">Being manufactured or wrapped</p>
-                </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-accent/5 border border-accent/10">
+              <div className="flex items-center gap-2">
+                <Gift className="h-4 w-4 text-accent" />
+                <span className="text-sm text-foreground">In progress</span>
               </div>
-              <span className="text-2xl font-bold text-accent">{stats.giftsInProgress}</span>
+              <span className="text-sm font-semibold text-accent">{stats.giftsInProgress}</span>
             </div>
             
-            <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Mail className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Unread Letters</p>
-                  <p className="text-sm text-muted-foreground">Waiting for magic reply</p>
-                </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-primary/5 border border-primary/10">
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-primary" />
+                <span className="text-sm text-foreground">Unread letters</span>
               </div>
-              <span className="text-2xl font-bold text-primary">{stats.unreadLetters}</span>
+              <span className="text-sm font-semibold text-primary">{stats.unreadLetters}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Countdown */}
-      <div className="rounded-2xl bg-gradient-christmas p-6 text-primary-foreground card-hover animate-fade-in" style={{ animationDelay: '500ms' }}>
+      <div className="rounded-xl bg-secondary p-5 text-secondary-foreground animate-fade-in" style={{ animationDelay: '300ms' }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-center md:text-left">
-            <h3 className="text-xl font-display font-bold">🎄 Christmas Countdown</h3>
-            <p className="text-primary-foreground/80 mt-1">The magic night is approaching!</p>
+          <div>
+            <h3 className="text-base font-medium flex items-center gap-2">
+              Christmas Countdown
+              <ArrowUpRight className="h-4 w-4 opacity-60" />
+            </h3>
+            <p className="text-sm opacity-80 mt-0.5">The big night is approaching</p>
           </div>
-          <div className="flex gap-4">
-            {['Days', 'Hours', 'Minutes'].map((label, i) => (
-              <div key={label} className="text-center">
-                <div className="text-3xl font-bold bg-primary-foreground/20 rounded-xl px-4 py-2">
-                  {i === 0 ? '11' : i === 1 ? '08' : '42'}
+          <div className="flex gap-3">
+            {[
+              { value: '11', label: 'Days' },
+              { value: '08', label: 'Hours' },
+              { value: '42', label: 'Min' }
+            ].map((item) => (
+              <div key={item.label} className="text-center">
+                <div className="text-2xl font-semibold bg-secondary-foreground/10 rounded-lg px-3 py-1.5 tabular-nums">
+                  {item.value}
                 </div>
-                <p className="text-xs mt-1 opacity-80">{label}</p>
+                <p className="text-[10px] mt-1 uppercase tracking-wide opacity-70">{item.label}</p>
               </div>
             ))}
           </div>

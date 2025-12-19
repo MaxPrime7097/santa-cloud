@@ -6,7 +6,8 @@ import {
   CircleDot,
   Mail,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Snowflake
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -16,7 +17,7 @@ const navigation = [
   { name: 'Children', href: '/children', icon: Users },
   { name: 'Gifts', href: '/gifts', icon: Gift },
   { name: 'Reindeers', href: '/reindeers', icon: CircleDot },
-  { name: 'Letters (AI)', href: '/letters', icon: Mail },
+  { name: 'Letters', href: '/letters', icon: Mail },
 ];
 
 const Sidebar = () => {
@@ -26,28 +27,28 @@ const Sidebar = () => {
   return (
     <aside 
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen bg-sidebar transition-all duration-300 ease-in-out",
-        collapsed ? "w-16" : "w-64"
+        "fixed left-0 top-0 z-40 h-screen bg-sidebar transition-all duration-300 ease-out border-r border-sidebar-border",
+        collapsed ? "w-16" : "w-56"
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-border">
+      <div className="flex h-14 items-center justify-between px-4 border-b border-sidebar-border">
         <div className={cn(
-          "flex items-center gap-2 transition-opacity duration-300",
+          "flex items-center gap-2 transition-opacity duration-200",
           collapsed ? "opacity-0 w-0" : "opacity-100"
         )}>
-          <span className="text-3xl animate-wiggle">🎅</span>
-          <span className="font-display text-xl font-bold text-sidebar-foreground">
+          <Snowflake className="h-5 w-5 text-sidebar-foreground" />
+          <span className="font-display text-base font-semibold text-sidebar-foreground">
             SantaCloud
           </span>
         </div>
         {collapsed && (
-          <span className="text-2xl mx-auto animate-wiggle">🎅</span>
+          <Snowflake className="h-5 w-5 text-sidebar-foreground mx-auto" />
         )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-2 py-4">
+      <nav className="flex-1 space-y-0.5 px-2 py-3">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;
           return (
@@ -55,19 +56,16 @@ const Sidebar = () => {
               key={item.name}
               to={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200",
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
                 isActive 
-                  ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg" 
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground" 
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
                 collapsed && "justify-center px-2"
               )}
             >
-              <item.icon className={cn(
-                "h-5 w-5 flex-shrink-0",
-                isActive && "animate-bounce-gentle"
-              )} />
+              <item.icon className="h-4 w-4 flex-shrink-0" />
               <span className={cn(
-                "transition-all duration-300",
+                "transition-all duration-200",
                 collapsed ? "hidden" : "block"
               )}>
                 {item.name}
@@ -80,28 +78,28 @@ const Sidebar = () => {
       {/* Collapse Button */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110"
+        className="absolute -right-3 top-16 flex h-6 w-6 items-center justify-center rounded-full bg-card border border-border text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground"
       >
         {collapsed ? (
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-3 w-3" />
         ) : (
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-3 w-3" />
         )}
       </button>
 
       {/* Footer */}
       <div className={cn(
-        "border-t border-sidebar-border p-4",
+        "border-t border-sidebar-border p-3",
         collapsed && "flex justify-center"
       )}>
         <div className={cn(
-          "flex items-center gap-2 text-sm text-sidebar-foreground/70",
+          "flex items-center gap-2 text-xs text-sidebar-foreground/50",
           collapsed && "hidden"
         )}>
-          <span className="sparkle">✨</span>
-          <span>Magic Level: 100%</span>
+          <span>✨</span>
+          <span>Ready for Christmas</span>
         </div>
-        {collapsed && <span className="sparkle text-xl">✨</span>}
+        {collapsed && <span className="text-sm">✨</span>}
       </div>
     </aside>
   );
