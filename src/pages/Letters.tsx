@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Mail, Sparkles, Send, Loader2 } from 'lucide-react';
 import { api, Letter } from '@/services/api';
 import { Button } from '@/components/ui/button';
-import Badge from '@/components/Badge';
+import { cn } from '@/lib/utils';
 
 const Letters = () => {
   const [letters, setLetters] = useState<Letter[]>([]);
@@ -11,7 +11,6 @@ const Letters = () => {
   const [generatedReply, setGeneratedReply] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Form state for new letter
   const [newChildName, setNewChildName] = useState('');
   const [newMessage, setNewMessage] = useState('');
 
@@ -55,10 +54,10 @@ const Letters = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="skeleton h-8 w-48" />
+        <div className="skeleton h-6 w-40" />
         <div className="grid gap-6 lg:grid-cols-2">
-          <div className="skeleton h-96" />
-          <div className="skeleton h-96" />
+          <div className="skeleton h-80 rounded-xl" />
+          <div className="skeleton h-80 rounded-xl" />
         </div>
       </div>
     );
@@ -68,19 +67,16 @@ const Letters = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-display font-bold text-foreground flex items-center gap-2">
-          <Mail className="h-8 w-8 text-primary" />
-          Letters & AI Assistant
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Read children's letters and generate magical replies with AI
+        <h1 className="text-xl font-semibold text-foreground">Letters</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          {letters.length} letters received
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Letters List */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">Incoming Letters</h2>
+        <div className="space-y-3">
+          <h2 className="text-sm font-medium text-foreground">Inbox</h2>
           
           {letters.map((letter, index) => (
             <div 
@@ -89,28 +85,34 @@ const Letters = () => {
                 setSelectedLetter(letter);
                 setGeneratedReply('');
               }}
-              className={`rounded-2xl bg-card border p-6 cursor-pointer card-hover animate-fade-in ${
+              className={cn(
+                "rounded-lg bg-card border p-4 cursor-pointer transition-all animate-fade-in",
                 selectedLetter?.id === letter.id 
-                  ? 'border-primary ring-2 ring-primary/20' 
-                  : 'border-border'
-              }`}
-              style={{ animationDelay: `${index * 100}ms` }}
+                  ? 'border-primary ring-1 ring-primary/20' 
+                  : 'border-border hover:border-muted-foreground/30'
+              )}
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-gold flex items-center justify-center text-lg">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center text-sm">
                     ✉️
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">{letter.childName}</h3>
-                    <p className="text-xs text-muted-foreground">{letter.receivedDate}</p>
+                    <h3 className="text-sm font-medium text-foreground">{letter.childName}</h3>
+                    <p className="text-[10px] text-muted-foreground">{letter.receivedDate}</p>
                   </div>
                 </div>
-                <Badge variant={letter.replied ? 'nice' : 'gold'}>
-                  {letter.replied ? '✅ Replied' : '⏳ Pending'}
-                </Badge>
+                <span className={cn(
+                  "text-[10px] font-medium px-1.5 py-0.5 rounded",
+                  letter.replied 
+                    ? 'bg-nice/10 text-nice' 
+                    : 'bg-accent/10 text-accent'
+                )}>
+                  {letter.replied ? 'Replied' : 'Pending'}
+                </span>
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-3">
+              <p className="text-xs text-muted-foreground line-clamp-2">
                 {letter.message}
               </p>
             </div>
@@ -119,78 +121,77 @@ const Letters = () => {
 
         {/* Reply Generator */}
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">Magic Reply Generator ✨</h2>
+          <h2 className="text-sm font-medium text-foreground">Reply Generator</h2>
           
           {/* Quick Reply Form */}
-          <div className="rounded-2xl bg-card border border-border p-6 animate-fade-in">
-            <h3 className="font-medium text-foreground mb-4">Write to any child</h3>
-            <div className="space-y-4">
+          <div className="rounded-xl bg-card border border-border p-4 animate-fade-in">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Quick Reply</h3>
+            <div className="space-y-3">
               <div>
-                <label className="text-sm text-muted-foreground block mb-1">Child's Name</label>
                 <input
                   type="text"
                   value={newChildName}
                   onChange={(e) => setNewChildName(e.target.value)}
-                  placeholder="Enter child's name..."
-                  className="w-full rounded-xl bg-muted/50 border border-border py-2 px-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  placeholder="Child's name"
+                  className="w-full rounded-lg bg-muted py-2 px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
               <div>
-                <label className="text-sm text-muted-foreground block mb-1">Their Message</label>
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Paste the child's letter here..."
-                  rows={4}
-                  className="w-full rounded-xl bg-muted/50 border border-border py-2 px-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                  placeholder="Paste the letter here..."
+                  rows={3}
+                  className="w-full rounded-lg bg-muted py-2 px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                 />
               </div>
               <Button 
-                className="btn-christmas rounded-xl w-full"
+                size="sm"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                 onClick={handleQuickReply}
                 disabled={isGenerating || !newChildName || !newMessage}
               >
                 {isGenerating ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Generating Magic...
+                    <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                    Generating...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate Magic Reply ✨
+                    <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                    Generate Reply
                   </>
                 )}
               </Button>
             </div>
           </div>
 
-          {/* Selected Letter Reply */}
+          {/* Selected Letter */}
           {selectedLetter && (
-            <div className="rounded-2xl bg-card border border-border p-6 animate-fade-in">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium text-foreground">
+            <div className="rounded-xl bg-card border border-border p-4 animate-fade-in">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-medium text-foreground">
                   Reply to {selectedLetter.childName}
                 </h3>
                 <Button 
                   size="sm"
-                  className="btn-gold rounded-lg"
+                  variant="outline"
+                  className="h-7 text-xs"
                   onClick={handleGenerateReply}
                   disabled={isGenerating}
                 >
                   {isGenerating ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
                     <>
-                      <Sparkles className="h-4 w-4 mr-1" />
+                      <Sparkles className="h-3 w-3 mr-1" />
                       Generate
                     </>
                   )}
                 </Button>
               </div>
               
-              <div className="p-4 rounded-xl bg-muted/50 text-sm text-muted-foreground mb-4">
-                <p className="font-medium text-foreground mb-1">Original Letter:</p>
+              <div className="p-3 rounded-lg bg-muted text-xs text-muted-foreground">
                 {selectedLetter.message}
               </div>
             </div>
@@ -198,42 +199,37 @@ const Letters = () => {
 
           {/* Generated Reply */}
           {(isGenerating || generatedReply) && (
-            <div className="rounded-2xl bg-gradient-forest border border-secondary p-6 text-secondary-foreground animate-fade-in">
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-5 w-5" />
-                <h3 className="font-semibold">Santa's Magic Reply</h3>
+            <div className="rounded-xl bg-secondary p-4 text-secondary-foreground animate-fade-in">
+              <div className="flex items-center gap-1.5 mb-3">
+                <Sparkles className="h-4 w-4" />
+                <h3 className="text-sm font-medium">Santa's Reply</h3>
               </div>
               
               {isGenerating ? (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <div className="text-4xl mb-4 animate-bounce-gentle">❄️</div>
-                  <p className="text-secondary-foreground/80">Sprinkling Christmas magic...</p>
-                  <div className="mt-4 flex gap-2">
-                    {[...Array(3)].map((_, i) => (
-                      <div 
-                        key={i}
-                        className="h-2 w-2 rounded-full bg-secondary-foreground/50 animate-bounce"
-                        style={{ animationDelay: `${i * 150}ms` }}
-                      />
-                    ))}
-                  </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <div className="text-2xl mb-2">✨</div>
+                  <p className="text-xs opacity-80">Generating magic...</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                <div className="space-y-3">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
                     {generatedReply}
-                  </div>
-                  <div className="flex gap-2 pt-4 border-t border-secondary-foreground/20">
-                    <Button className="flex-1 bg-secondary-foreground/20 hover:bg-secondary-foreground/30 text-secondary-foreground rounded-xl">
-                      <Send className="h-4 w-4 mr-2" />
-                      Send Reply
+                  </p>
+                  <div className="flex gap-2 pt-3 border-t border-secondary-foreground/20">
+                    <Button 
+                      size="sm"
+                      className="flex-1 bg-secondary-foreground/20 hover:bg-secondary-foreground/30 text-secondary-foreground text-xs"
+                    >
+                      <Send className="h-3 w-3 mr-1.5" />
+                      Send
                     </Button>
                     <Button 
+                      size="sm"
                       variant="ghost" 
-                      className="text-secondary-foreground hover:bg-secondary-foreground/10 rounded-xl"
+                      className="text-secondary-foreground hover:bg-secondary-foreground/10 text-xs"
                       onClick={() => setGeneratedReply('')}
                     >
-                      Regenerate
+                      Retry
                     </Button>
                   </div>
                 </div>
