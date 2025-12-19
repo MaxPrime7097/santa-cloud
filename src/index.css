@@ -167,6 +167,68 @@
       width: 0%;
     }
   }
+
+  /* Hover Lift Effect */
+  .hover-lift {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    @apply shadow-md;
+  }
+
+  /* Active Press Effect */
+  .press-effect {
+    @apply transition-transform duration-100;
+  }
+
+  .press-effect:active {
+    transform: scale(0.97);
+  }
+
+  /* Shimmer Effect for Loading */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+
+  /* Safe area for mobile bottom nav */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Staggered animation helper */
+  .stagger-1 { animation-delay: 50ms; }
+  .stagger-2 { animation-delay: 100ms; }
+  .stagger-3 { animation-delay: 150ms; }
+  .stagger-4 { animation-delay: 200ms; }
+  .stagger-5 { animation-delay: 250ms; }
+
+  /* Focus ring animation */
+  .focus-ring {
+    @apply transition-all duration-200;
+  }
+
+  .focus-ring:focus {
+    @apply outline-none ring-2 ring-primary/30 ring-offset-2 ring-offset-background;
+  }
+
+  /* Interactive badge pulse */
+  .badge-pulse {
+    @apply relative;
+  }
+
+  .badge-pulse::after {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-current opacity-50 animate-ping;
+  }
 }
 
 @layer utilities {

@@ -22,10 +22,10 @@ const StatsCard = ({ title, value, icon: Icon, trend, variant = 'default', delay
   };
 
   const iconVariants = {
-    default: 'text-muted-foreground',
-    primary: 'text-primary-foreground/80',
-    secondary: 'text-secondary-foreground/80',
-    accent: 'text-accent',
+    default: 'text-muted-foreground group-hover:text-foreground',
+    primary: 'text-primary-foreground/80 group-hover:text-primary-foreground',
+    secondary: 'text-secondary-foreground/80 group-hover:text-secondary-foreground',
+    accent: 'text-accent group-hover:scale-110',
   };
 
   const isColoredVariant = variant !== 'default' && variant !== 'accent';
@@ -33,7 +33,7 @@ const StatsCard = ({ title, value, icon: Icon, trend, variant = 'default', delay
   return (
     <div 
       className={cn(
-        "relative rounded-xl border p-5 animate-fade-in",
+        "relative rounded-xl border p-4 md:p-5 animate-fade-in hover-lift group cursor-default",
         variants[variant]
       )}
       style={{ animationDelay: `${delay}ms` }}
@@ -41,17 +41,17 @@ const StatsCard = ({ title, value, icon: Icon, trend, variant = 'default', delay
       <div className="flex items-start justify-between">
         <div>
           <p className={cn(
-            "text-xs font-medium uppercase tracking-wide",
+            "text-[10px] md:text-xs font-medium uppercase tracking-wide",
             isColoredVariant ? 'opacity-80' : 'text-muted-foreground'
           )}>
             {title}
           </p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight">
+          <p className="mt-1.5 md:mt-2 text-xl md:text-2xl font-semibold tracking-tight">
             {value}
           </p>
           {trend && (
             <p className={cn(
-              "mt-1 text-xs font-medium",
+              "mt-1 text-[10px] md:text-xs font-medium",
               trend.positive ? 'text-nice' : 'text-naughty',
               isColoredVariant && 'opacity-90'
             )}>
@@ -59,7 +59,10 @@ const StatsCard = ({ title, value, icon: Icon, trend, variant = 'default', delay
             </p>
           )}
         </div>
-        <Icon className={cn("h-5 w-5", iconVariants[variant])} />
+        <Icon className={cn(
+          "h-4 w-4 md:h-5 md:w-5 transition-all duration-200",
+          iconVariants[variant]
+        )} />
       </div>
     </div>
   );
