@@ -135,6 +135,7 @@ export default {
         "shimmer": "shimmer 2s linear infinite",
         "slide-up": "slide-up 0.4s ease-out forwards",
         "number-pop": "number-pop 0.3s ease-out",
+        "hover-lift": "hover-lift 0.2s ease-out forwards",
       },
     },
   },

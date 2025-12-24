@@ -260,6 +260,15 @@
       0 0 20px hsl(var(--primary) / 0.1);
   }
 
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-transform duration-200 ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+
   /* Progress bar with gradient */
   .progress-gradient {
     background: linear-gradient(
@@ -415,6 +424,15 @@
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
+  }
+
+  /* Press effect for buttons */
+  .press-effect {
+    @apply transition-transform duration-100;
+  }
+
+  .press-effect:active {
+    transform: scale(0.97);
   }
 
   /* Safe area for mobile */
