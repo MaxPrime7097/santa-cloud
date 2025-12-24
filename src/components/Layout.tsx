@@ -2,12 +2,12 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import MobileNav from './MobileNav';
-import SnowEffect from './SnowEffect';
+import { AuroraBackground } from './AuroraBackground';
 
 const Layout = () => {
   return (
-    <div className="min-h-screen">
-      <SnowEffect />
+    <div className="min-h-screen relative">
+      <AuroraBackground />
       
       {/* Desktop Sidebar */}
       <Sidebar />
@@ -15,7 +15,7 @@ const Layout = () => {
       {/* Main Content */}
       <div className="md:pl-56 transition-all duration-300">
         <Topbar />
-        <main className="relative z-10 p-4 md:p-6 pb-24 md:pb-6">
+        <main className="relative p-4 md:p-6 pb-24 md:pb-6">
           <Outlet />
         </main>
       </div>
