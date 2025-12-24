@@ -9,12 +9,22 @@ interface Star {
   duration: number;
 }
 
+interface Snowflake {
+  id: number;
+  left: number;
+  delay: number;
+  duration: number;
+  size: number;
+}
+
 export function AuroraBackground() {
   const [stars, setStars] = useState<Star[]>([]);
+  const [snowflakes, setSnowflakes] = useState<Snowflake[]>([]);
 
   useEffect(() => {
+    // Generate stars
     const generatedStars: Star[] = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 40; i++) {
       generatedStars.push({
         id: i,
         x: Math.random() * 100,
@@ -25,6 +35,19 @@ export function AuroraBackground() {
       });
     }
     setStars(generatedStars);
+
+    // Generate snowflakes
+    const generatedSnowflakes: Snowflake[] = [];
+    for (let i = 0; i < 35; i++) {
+      generatedSnowflakes.push({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 10,
+        duration: 8 + Math.random() * 12,
+        size: Math.random() * 0.6 + 0.4,
+      });
+    }
+    setSnowflakes(generatedSnowflakes);
   }, []);
 
   return (
@@ -63,6 +86,24 @@ export function AuroraBackground() {
               animationDuration: `${star.duration}s`,
             }}
           />
+        ))}
+      </div>
+
+      {/* Falling snowflakes */}
+      <div className="snowflakes">
+        {snowflakes.map((flake) => (
+          <div
+            key={flake.id}
+            className="snowflake"
+            style={{
+              left: `${flake.left}%`,
+              animationDelay: `${flake.delay}s`,
+              animationDuration: `${flake.duration}s`,
+              fontSize: `${flake.size}rem`,
+            }}
+          >
+            ❄
+          </div>
         ))}
       </div>
     </>

@@ -487,6 +487,40 @@
     33% { transform: translate(10px, -10px) scale(1.05); }
     66% { transform: translate(-10px, 10px) scale(0.95); }
   }
+
+  /* Snowflakes container */
+  .snowflakes {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .snowflake {
+    position: absolute;
+    top: -5%;
+    color: hsl(var(--foreground) / 0.6);
+    animation: snowfall linear infinite;
+    text-shadow: 0 0 4px hsl(var(--foreground) / 0.3);
+  }
+
+  @keyframes snowfall {
+    0% {
+      transform: translateY(0) rotate(0deg) translateX(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.8;
+    }
+    90% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(105vh) rotate(360deg) translateX(20px);
+      opacity: 0;
+    }
+  }
 }
 
 @layer utilities {
