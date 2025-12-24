@@ -29,30 +29,26 @@ export function AuroraBackground() {
 
   return (
     <>
-      {/* Aurora gradient background */}
+      {/* Christmas gradient background */}
       <div className="aurora-bg" />
       
-      {/* Floating orbs */}
+      {/* Subtle floating orbs with Christmas colors */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div 
-          className="orb w-96 h-96 bg-primary/20 -top-48 -left-48"
+          className="orb w-80 h-80 bg-primary/10 -top-40 -left-40"
           style={{ animationDelay: '0s' }}
         />
         <div 
-          className="orb w-80 h-80 bg-secondary/15 top-1/3 -right-40"
-          style={{ animationDelay: '3s' }}
+          className="orb w-64 h-64 bg-secondary/8 top-1/4 -right-32"
+          style={{ animationDelay: '4s' }}
         />
         <div 
-          className="orb w-64 h-64 bg-nice/10 bottom-20 left-1/4"
-          style={{ animationDelay: '6s' }}
-        />
-        <div 
-          className="orb w-48 h-48 bg-accent/10 top-1/2 left-1/2"
-          style={{ animationDelay: '2s' }}
+          className="orb w-48 h-48 bg-accent/6 bottom-24 left-1/3"
+          style={{ animationDelay: '8s' }}
         />
       </div>
 
-      {/* Stars */}
+      {/* Twinkling stars */}
       <div className="stars">
         {stars.map((star) => (
           <div
