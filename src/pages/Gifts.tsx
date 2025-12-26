@@ -1,20 +1,32 @@
 import { useEffect, useState } from 'react';
-import { Gift as GiftIcon, Package, CheckCircle, Truck, Wrench } from 'lucide-react';
+import { Gift as GiftIcon, Package, CheckCircle, Truck, Wrench, ChevronRight } from 'lucide-react';
 import { api, Gift } from '@/services/api';
 import PageTransition from '@/components/PageTransition';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 const Gifts = () => {
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { toast } = useToast();
+
+  const fetchGifts = async () => {
+    setIsLoading(true);
+    const data = await api.getGifts();
+    setGifts(data);
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    const fetchGifts = async () => {
-      setIsLoading(true);
-      const data = await api.getGifts();
-      setGifts(data);
-      setIsLoading(false);
-    };
     fetchGifts();
   }, []);
 
@@ -40,6 +52,39 @@ const Gifts = () => {
     wrapping: gifts.filter(g => g.status === 'wrapping').length,
     ready: gifts.filter(g => g.status === 'ready').length,
     delivered: gifts.filter(g => g.status === 'delivered').length,
+  };
+
+  const statusOrder: Gift['status'][] = ['manufacturing', 'wrapping', 'ready', 'delivered'];
+  
+  const getNextStatus = (currentStatus: Gift['status']): Gift['status'] | null => {
+    const currentIndex = statusOrder.indexOf(currentStatus);
+    if (currentIndex < statusOrder.length - 1) {
+      return statusOrder[currentIndex + 1];
+    }
+    return null;
+  };
+
+  const handleUpdateStatus = async (gift: Gift, newStatus: Gift['status']) => {
+    setIsUpdating(true);
+    try {
+      const updated = await api.updateGiftStatus(gift.id, newStatus);
+      if (updated) {
+        setGifts(prev => prev.map(g => g.id === gift.id ? { ...g, status: newStatus } : g));
+        setSelectedGift(prev => prev?.id === gift.id ? { ...prev, status: newStatus } : prev);
+        toast({
+          title: "🎁 Gift Updated!",
+          description: `${gift.giftName} is now ${newStatus}`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update gift status.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   if (isLoading) {
@@ -100,11 +145,13 @@ const Gifts = () => {
         <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {gifts.map((gift, index) => {
             const config = statusConfig[gift.status];
+            const nextStatus = getNextStatus(gift.status);
             return (
               <div 
                 key={gift.id} 
-                className="rounded-xl bg-card border border-border p-4 animate-fade-in hover-lift"
+                className="rounded-xl bg-card border border-border p-4 animate-fade-in hover-lift cursor-pointer"
                 style={{ animationDelay: `${(index + 4) * 40}ms` }}
+                onClick={() => setSelectedGift(gift)}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2.5">
@@ -164,8 +211,8 @@ const Gifts = () => {
                   })}
                 </div>
 
-                {/* Priority */}
-                <div className="mt-3">
+                {/* Priority + Update Button */}
+                <div className="mt-3 flex items-center justify-between">
                   <span className={cn(
                     "text-[10px] font-medium px-1.5 py-0.5 rounded",
                     gift.priority === 'high' 
@@ -176,11 +223,135 @@ const Gifts = () => {
                   )}>
                     {gift.priority} priority
                   </span>
+                  {nextStatus && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 text-[10px] text-primary press-effect"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUpdateStatus(gift, nextStatus);
+                      }}
+                      disabled={isUpdating}
+                    >
+                      → {nextStatus}
+                    </Button>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
+
+        {/* Gift Detail Modal */}
+        <Dialog open={!!selectedGift} onOpenChange={() => setSelectedGift(null)}>
+          <DialogContent className="sm:max-w-md bg-card border-border">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center text-2xl">
+                  🎁
+                </div>
+                <div>
+                  <span className="text-foreground">{selectedGift?.giftName}</span>
+                  <p className="text-sm font-normal text-muted-foreground mt-0.5">
+                    For {selectedGift?.childName}
+                  </p>
+                </div>
+              </DialogTitle>
+            </DialogHeader>
+            
+            {selectedGift && (
+              <div className="space-y-4 mt-2">
+                {/* Current Status */}
+                <div className={cn(
+                  "rounded-lg p-4 border",
+                  statusConfig[selectedGift.status].bg,
+                  statusConfig[selectedGift.status].border
+                )}>
+                  <div className="flex items-center gap-2 mb-2">
+                    {(() => {
+                      const Icon = statusConfig[selectedGift.status].icon;
+                      return <Icon className={cn("h-5 w-5", statusConfig[selectedGift.status].color)} />;
+                    })()}
+                    <span className={cn("font-medium capitalize", statusConfig[selectedGift.status].color)}>
+                      {selectedGift.status}
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-background/50 overflow-hidden">
+                    <div 
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{ 
+                        width: `${getProgressPercentage(selectedGift.status)}%`,
+                        backgroundColor: 'hsl(var(--primary))'
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Progress: {getProgressPercentage(selectedGift.status)}%
+                  </p>
+                </div>
+
+                {/* Progress Steps */}
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground font-medium">Update Progress</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {statusOrder.map((status) => {
+                      const config = statusConfig[status];
+                      const Icon = config.icon;
+                      const isActive = selectedGift.status === status;
+                      const isPast = statusOrder.indexOf(selectedGift.status) > statusOrder.indexOf(status);
+                      
+                      return (
+                        <button
+                          key={status}
+                          onClick={() => handleUpdateStatus(selectedGift, status)}
+                          disabled={isUpdating || isActive}
+                          className={cn(
+                            "flex items-center gap-2 p-3 rounded-lg border transition-all press-effect",
+                            isActive 
+                              ? `${config.bg} ${config.border}` 
+                              : isPast
+                              ? "bg-nice/5 border-nice/20"
+                              : "bg-muted/50 border-border hover:border-primary/30",
+                            isActive && "ring-2 ring-offset-2 ring-offset-background",
+                            isActive ? "ring-primary/50" : ""
+                          )}
+                        >
+                          <Icon className={cn(
+                            "h-4 w-4",
+                            isActive ? config.color : isPast ? "text-nice" : "text-muted-foreground"
+                          )} />
+                          <span className={cn(
+                            "text-xs font-medium capitalize",
+                            isActive ? config.color : isPast ? "text-nice" : "text-muted-foreground"
+                          )}>
+                            {status}
+                          </span>
+                          {isPast && <CheckCircle className="h-3 w-3 text-nice ml-auto" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Priority */}
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <span className="text-xs text-muted-foreground">Priority</span>
+                  <span className={cn(
+                    "text-xs font-medium px-2 py-0.5 rounded capitalize",
+                    selectedGift.priority === 'high' 
+                      ? 'bg-primary/10 text-primary' 
+                      : selectedGift.priority === 'medium'
+                      ? 'bg-accent/10 text-accent'
+                      : 'bg-muted text-muted-foreground'
+                  )}>
+                    {selectedGift.priority}
+                  </span>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </PageTransition>
   );

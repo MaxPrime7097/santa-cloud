@@ -46,8 +46,8 @@ export interface DashboardStats {
   unreadLetters: number;
 }
 
-// Mock Data
-const mockChildren: Child[] = [
+// Mock Data - using let to allow mutations
+let mockChildren: Child[] = [
   { id: '1', name: 'Emma Thompson', age: 7, country: 'USA', status: 'nice', wishlist: ['Teddy Bear', 'Art Set'], niceScore: 95 },
   { id: '2', name: 'Lucas Martin', age: 9, country: 'France', status: 'nice', wishlist: ['Lego Set', 'Soccer Ball'], niceScore: 88 },
   { id: '3', name: 'Sofia Garcia', age: 6, country: 'Spain', status: 'nice', wishlist: ['Doll House', 'Books'], niceScore: 92 },
@@ -58,7 +58,7 @@ const mockChildren: Child[] = [
   { id: '8', name: 'Noah Kim', age: 8, country: 'South Korea', status: 'nice', wishlist: ['Robot Kit', 'Books'], niceScore: 85 },
 ];
 
-const mockGifts: Gift[] = [
+let mockGifts: Gift[] = [
   { id: '1', childId: '1', childName: 'Emma Thompson', giftName: 'Teddy Bear Deluxe', status: 'ready', priority: 'high' },
   { id: '2', childId: '2', childName: 'Lucas Martin', giftName: 'Lego City Set', status: 'wrapping', priority: 'high' },
   { id: '3', childId: '3', childName: 'Sofia Garcia', giftName: 'Victorian Doll House', status: 'manufacturing', priority: 'medium' },
@@ -127,6 +127,35 @@ export const api = {
       c.name.toLowerCase().includes(lowerQuery) ||
       c.country.toLowerCase().includes(lowerQuery)
     );
+  },
+
+  async addChild(child: Omit<Child, 'id'>): Promise<{ child: Child; gifts: Gift[] }> {
+    await delay(500);
+    const newId = String(Date.now());
+    const newChild: Child = {
+      ...child,
+      id: newId,
+    };
+    mockChildren.push(newChild);
+    
+    // Auto-create gifts from wishlist for nice children
+    const newGifts: Gift[] = [];
+    if (child.status === 'nice' && child.wishlist.length > 0) {
+      child.wishlist.forEach((item, index) => {
+        const gift: Gift = {
+          id: `${newId}-${index}`,
+          childId: newId,
+          childName: child.name,
+          giftName: item,
+          status: 'manufacturing',
+          priority: child.niceScore >= 90 ? 'high' : child.niceScore >= 70 ? 'medium' : 'low',
+        };
+        mockGifts.push(gift);
+        newGifts.push(gift);
+      });
+    }
+    
+    return { child: newChild, gifts: newGifts };
   },
 
   // Gifts
