@@ -5,12 +5,15 @@ import DataTable from '@/components/DataTable';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/PageTransition';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const Children = () => {
   const [children, setChildren] = useState<Child[]>([]);
@@ -18,6 +21,20 @@ const Children = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'nice' | 'naughty'>('all');
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    age: '',
+    country: '',
+    status: 'nice' as 'nice' | 'naughty',
+    niceScore: '75',
+    wishlist: '',
+  });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchChildren = async () => {
@@ -39,6 +56,68 @@ const Children = () => {
 
   const niceCount = children.filter(c => c.status === 'nice').length;
   const naughtyCount = children.filter(c => c.status === 'naughty').length;
+
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.name.trim() || formData.name.length > 100) {
+      errors.name = 'Name is required (max 100 characters)';
+    }
+    const age = parseInt(formData.age);
+    if (isNaN(age) || age < 1 || age > 18) {
+      errors.age = 'Age must be between 1 and 18';
+    }
+    if (!formData.country.trim() || formData.country.length > 100) {
+      errors.country = 'Country is required (max 100 characters)';
+    }
+    const score = parseInt(formData.niceScore);
+    if (isNaN(score) || score < 0 || score > 100) {
+      errors.niceScore = 'Score must be between 0 and 100';
+    }
+    if (!formData.wishlist.trim()) {
+      errors.wishlist = 'At least one wishlist item is required';
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleAddChild = async () => {
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    try {
+      const wishlistItems = formData.wishlist.split(',').map(item => item.trim()).filter(Boolean);
+      const newChild: Omit<Child, 'id'> = {
+        name: formData.name.trim(),
+        age: parseInt(formData.age),
+        country: formData.country.trim(),
+        status: formData.status,
+        niceScore: parseInt(formData.niceScore),
+        wishlist: wishlistItems,
+      };
+      
+      const result = await api.addChild(newChild);
+      setChildren(prev => [...prev, result.child]);
+      
+      toast({
+        title: "🎅 Child Added!",
+        description: result.gifts.length > 0 
+          ? `${result.child.name} added with ${result.gifts.length} gift(s) in production!`
+          : `${result.child.name} has been added to the list.`,
+      });
+      
+      setIsAddModalOpen(false);
+      setFormData({ name: '', age: '', country: '', status: 'nice', niceScore: '75', wishlist: '' });
+      setFormErrors({});
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add child. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Mobile card view
   const MobileChildCard = ({ child, index }: { child: Child; index: number }) => (
@@ -199,7 +278,11 @@ const Children = () => {
               {children.length} children on the list
             </p>
           </div>
-          <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground press-effect w-full sm:w-auto">
+          <Button 
+            size="sm" 
+            className="bg-primary hover:bg-primary/90 text-primary-foreground press-effect w-full sm:w-auto"
+            onClick={() => setIsAddModalOpen(true)}
+          >
             <Plus className="h-4 w-4 mr-1.5" />
             Add Child
           </Button>
@@ -375,6 +458,139 @@ const Children = () => {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Child Modal */}
+        <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+          <DialogContent className="sm:max-w-md bg-card border-border">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-foreground">
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Plus className="h-5 w-5 text-primary" />
+                </div>
+                Add New Child
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4 mt-2">
+              {/* Name */}
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-xs text-muted-foreground">Name *</Label>
+                <Input
+                  id="name"
+                  placeholder="Enter child's name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="bg-muted border-border"
+                  maxLength={100}
+                />
+                {formErrors.name && <p className="text-xs text-naughty">{formErrors.name}</p>}
+              </div>
+
+              {/* Age & Country */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="age" className="text-xs text-muted-foreground">Age *</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    placeholder="Age"
+                    min={1}
+                    max={18}
+                    value={formData.age}
+                    onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                    className="bg-muted border-border"
+                  />
+                  {formErrors.age && <p className="text-xs text-naughty">{formErrors.age}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="country" className="text-xs text-muted-foreground">Country *</Label>
+                  <Input
+                    id="country"
+                    placeholder="Country"
+                    value={formData.country}
+                    onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
+                    className="bg-muted border-border"
+                    maxLength={100}
+                  />
+                  {formErrors.country && <p className="text-xs text-naughty">{formErrors.country}</p>}
+                </div>
+              </div>
+
+              {/* Status & Nice Score */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Status *</Label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, status: 'nice' }))}
+                      className={cn(
+                        "flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all press-effect",
+                        formData.status === 'nice' 
+                          ? "bg-nice/20 text-nice border border-nice/30" 
+                          : "bg-muted text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Nice ✨
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, status: 'naughty' }))}
+                      className={cn(
+                        "flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all press-effect",
+                        formData.status === 'naughty' 
+                          ? "bg-naughty/20 text-naughty border border-naughty/30" 
+                          : "bg-muted text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Naughty ⚠️
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="niceScore" className="text-xs text-muted-foreground">Nice Score (0-100) *</Label>
+                  <Input
+                    id="niceScore"
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={formData.niceScore}
+                    onChange={(e) => setFormData(prev => ({ ...prev, niceScore: e.target.value }))}
+                    className="bg-muted border-border"
+                  />
+                  {formErrors.niceScore && <p className="text-xs text-naughty">{formErrors.niceScore}</p>}
+                </div>
+              </div>
+
+              {/* Wishlist */}
+              <div className="space-y-1.5">
+                <Label htmlFor="wishlist" className="text-xs text-muted-foreground">Wishlist * (comma separated)</Label>
+                <Input
+                  id="wishlist"
+                  placeholder="Teddy Bear, Lego Set, Books"
+                  value={formData.wishlist}
+                  onChange={(e) => setFormData(prev => ({ ...prev, wishlist: e.target.value }))}
+                  className="bg-muted border-border"
+                />
+                {formErrors.wishlist && <p className="text-xs text-naughty">{formErrors.wishlist}</p>}
+                {formData.status === 'nice' && formData.wishlist && (
+                  <p className="text-[10px] text-muted-foreground">
+                    🎁 {formData.wishlist.split(',').filter(i => i.trim()).length} gift(s) will be added to production
+                  </p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <Button 
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground press-effect"
+                onClick={handleAddChild}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Adding...' : '🎅 Add to Santa\'s List'}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
