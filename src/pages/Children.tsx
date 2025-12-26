@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Search, Plus, Users } from 'lucide-react';
+import { Search, Plus, Gift, MapPin, Calendar, Star, X } from 'lucide-react';
 import { api, Child } from '@/services/api';
 import DataTable from '@/components/DataTable';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/PageTransition';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const Children = () => {
   const [children, setChildren] = useState<Child[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'nice' | 'naughty'>('all');
+  const [selectedChild, setSelectedChild] = useState<Child | null>(null);
 
   useEffect(() => {
     const fetchChildren = async () => {
@@ -36,8 +43,9 @@ const Children = () => {
   // Mobile card view
   const MobileChildCard = ({ child, index }: { child: Child; index: number }) => (
     <div 
-      className="rounded-xl bg-card border border-border p-4 animate-fade-in hover-lift"
+      className="rounded-xl bg-card border border-border p-4 animate-fade-in hover-lift cursor-pointer"
       style={{ animationDelay: `${index * 30}ms` }}
+      onClick={() => setSelectedChild(child)}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -163,8 +171,16 @@ const Children = () => {
     },
     {
       header: '',
-      accessor: () => (
-        <Button variant="ghost" size="sm" className="text-xs text-primary h-7 press-effect">
+      accessor: (row: Child) => (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-xs text-primary h-7 press-effect"
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedChild(row);
+          }}
+        >
           View
         </Button>
       ),
@@ -260,6 +276,107 @@ const Children = () => {
             isLoading={isLoading}
           />
         </div>
+
+        {/* Child Detail Modal */}
+        <Dialog open={!!selectedChild} onOpenChange={() => setSelectedChild(null)}>
+          <DialogContent className="sm:max-w-md bg-card border-border">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-semibold text-primary">
+                  {selectedChild?.name.charAt(0)}
+                </div>
+                <div>
+                  <span className="text-foreground">{selectedChild?.name}</span>
+                  <p className="text-sm font-normal text-muted-foreground mt-0.5">
+                    {selectedChild?.status === 'nice' ? '🌟 Nice List' : '⚠️ Naughty List'}
+                  </p>
+                </div>
+              </DialogTitle>
+            </DialogHeader>
+            
+            {selectedChild && (
+              <div className="space-y-4 mt-2">
+                {/* Info Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg bg-muted/50 p-3">
+                    <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                      <MapPin className="h-3.5 w-3.5" />
+                      <span className="text-xs">Country</span>
+                    </div>
+                    <p className="text-sm font-medium text-foreground">{selectedChild.country}</p>
+                  </div>
+                  <div className="rounded-lg bg-muted/50 p-3">
+                    <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span className="text-xs">Age</span>
+                    </div>
+                    <p className="text-sm font-medium text-foreground">{selectedChild.age} years old</p>
+                  </div>
+                </div>
+
+                {/* Nice Score */}
+                <div className="rounded-lg bg-muted/50 p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Star className="h-3.5 w-3.5" />
+                      <span className="text-xs">Nice Score</span>
+                    </div>
+                    <span className={cn(
+                      "text-sm font-semibold",
+                      selectedChild.niceScore >= 70 ? "text-nice" : "text-naughty"
+                    )}>
+                      {selectedChild.niceScore}%
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-background overflow-hidden">
+                    <div 
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{ 
+                        width: `${selectedChild.niceScore}%`,
+                        backgroundColor: selectedChild.niceScore >= 70 ? 'hsl(var(--nice))' : 'hsl(var(--naughty))'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Wishlist */}
+                <div className="rounded-lg bg-muted/50 p-3">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                    <Gift className="h-3.5 w-3.5" />
+                    <span className="text-xs">Wishlist ({selectedChild.wishlist.length} items)</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedChild.wishlist.map((item, i) => (
+                      <span 
+                        key={i}
+                        className="text-xs bg-background px-2.5 py-1 rounded-full text-foreground border border-border"
+                      >
+                        🎁 {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Status Badge */}
+                <div className={cn(
+                  "rounded-lg p-3 text-center",
+                  selectedChild.status === 'nice' 
+                    ? "bg-nice/10 border border-nice/20" 
+                    : "bg-naughty/10 border border-naughty/20"
+                )}>
+                  <p className={cn(
+                    "text-sm font-medium",
+                    selectedChild.status === 'nice' ? "text-nice" : "text-naughty"
+                  )}>
+                    {selectedChild.status === 'nice' 
+                      ? "✨ This child has been very good this year!" 
+                      : "📝 This child needs to improve their behavior"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </PageTransition>
   );
