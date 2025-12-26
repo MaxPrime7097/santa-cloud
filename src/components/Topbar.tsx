@@ -97,7 +97,7 @@ const Topbar = () => {
 
         {/* Avatar */}
         <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-sm text-primary-foreground font-medium hover:ring-2 hover:ring-primary/30 hover:ring-offset-2 hover:ring-offset-background transition-all duration-200 cursor-pointer">
-          S
+          🎅🏾
         </div>
       </div>
     </header>
