@@ -1,73 +1,116 @@
-# Welcome to your Lovable project
+# SantaCloud AWS Backend
 
-## Project info
+This directory contains the AWS CDK infrastructure for the SantaCloud application backend.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Architecture
 
-## How can I edit this code?
+- **API Gateway**: REST API with CORS enabled
+- **Lambda Functions**: Serverless functions for each API endpoint
+- **DynamoDB Tables**:
+  - `SantaChildren`: Stores child information
+  - `SantaGifts`: Stores gift manufacturing status
+  - `SantaReindeers`: Stores reindeer status and location
+  - `SantaLetters`: Stores children's letters
 
-There are several ways of editing your application.
+## Prerequisites
 
-**Use Lovable**
+1. AWS CLI installed and configured with credentials
+2. Node.js 18+ installed
+3. AWS CDK CLI installed (`npm install -g aws-cdk`)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Deployment
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **Install dependencies:**
+   ```bash
+   cd backend
+   npm install
+   ```
 
-**Use your preferred IDE**
+2. **Bootstrap CDK (first time only):**
+   ```bash
+   cdk bootstrap
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3. **Deploy the stack:**
+   ```bash
+   cdk deploy
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+4. **Note the API URL** from the deployment output (e.g., `https://abc123.execute-api.us-east-1.amazonaws.com/prod`)
 
-Follow these steps:
+## Populate Initial Data
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+After deployment, add the initial data to DynamoDB tables using AWS Console or CLI:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Children Table
+```json
+[
+  {"id": "1", "name": "Emma Thompson", "age": 7, "country": "USA", "status": "nice", "wishlist": ["Teddy Bear", "Art Set"], "niceScore": 95},
+  {"id": "2", "name": "Lucas Martin", "age": 9, "country": "France", "status": "nice", "wishlist": ["Lego Set", "Soccer Ball"], "niceScore": 88},
+  // ... add all children
+]
 ```
 
-**Edit a file directly in GitHub**
+### Gifts Table
+```json
+[
+  {"id": "1", "childId": "1", "childName": "Emma Thompson", "giftName": "Teddy Bear Deluxe", "status": "ready", "priority": "high"},
+  // ... add all gifts
+]
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Reindeers Table
+```json
+[
+  {"id": "1", "name": "Rudolph", "status": "resting", "location": "North Pole Stable", "energyLevel": 100},
+  // ... add all reindeers
+]
+```
 
-**Use GitHub Codespaces**
+### Letters Table
+```json
+[
+  {"id": "1", "childName": "Emma Thompson", "message": "Dear Santa...", "receivedDate": "2024-12-01", "replied": true},
+  // ... add all letters
+]
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Update Frontend
 
-## What technologies are used for this project?
+1. In `src/services/api.ts`, replace the `API_BASE` URL with your deployed API Gateway URL:
+   ```typescript
+   const API_BASE = 'https://your-api-id.execute-api.region.amazonaws.com/prod';
+   ```
 
-This project is built with:
+2. Start the frontend:
+   ```bash
+   npm run dev
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## API Endpoints
 
-## How can I deploy this project?
+- `GET /dashboard/stats` - Get dashboard statistics
+- `GET /children` - Get all children (supports `?query=search`)
+- `GET /children/{id}` - Get single child
+- `POST /children` - Add new child
+- `GET /gifts` - Get all gifts
+- `PUT /gifts/{id}` - Update gift status
+- `GET /gifts/progress` - Get gift progress statistics
+- `GET /reindeers` - Get all reindeers
+- `PUT /reindeers/{id}` - Update reindeer status
+- `GET /letters` - Get all letters
+- `POST /letters/reply` - Generate magic reply
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Cleanup
 
-## Can I connect a custom domain to my Lovable project?
+To destroy the stack:
+```bash
+cd backend
+cdk destroy
+```
 
-Yes, you can!
+## Cost Optimization
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- DynamoDB uses on-demand pricing
+- Lambda functions are triggered only when needed
+- Consider API Gateway caching for frequently accessed data
