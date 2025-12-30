@@ -1,18 +1,4 @@
-Got it. Right now your README reads like “backend-only infra notes”. What you want is a project-level README that:
 
-Explains what SantaCloud is
-
-Covers frontend + backend
-
-Is understandable by developers, judges, and collaborators
-
-Still keeps the technical depth you already have
-
-
-Below is a clean, complete, full-stack README you can drop at the root of the repo.
-
-
----
 
 🎅 SantaCloud – Full Stack Application
 
@@ -52,7 +38,7 @@ Styling: Tailwind CSS
 
 API Communication: REST (API Gateway)
 
-Deployment: Static hosting (Vercel / Netlify / S3)
+Deployment: Static hosting (AWS Amplify)
 
 
 Backend (Serverless)
