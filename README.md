@@ -19,7 +19,7 @@ The official dashboard for Santa Claus to manage his annual Christmas tour. Trac
 - 🎨 **Magical UI**: Beautiful, festive interface with smooth animations and transitions
 
 ## Demo
-A live demo of SantaCloud is available [here](https://main.d2ecy513ameohs.amplifyapp.com/) (credentials: demo/demo).
+A live demo of SantaCloud is available [here](https://main.d2ecy513ameohs.amplifyapp.com/).
 
 
 ## 🏗️ Architecture
