@@ -1,11 +1,13 @@
 # 🎄 SantaCloud - Santa's Magic Dashboard
 
-> The official dashboard for Santa Claus to manage his annual Christmas tour. Track children, gifts, reindeers, and magical letters!
-
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![AWS](https://img.shields.io/badge/AWS-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+
+## 🎯 Description
+
+The official dashboard for Santa Claus to manage his annual Christmas tour. Track children, gifts, reindeers, and magical letters with a beautiful, festive interface featuring smooth animations and real-time analytics.
 
 ## ✨ Features
 
@@ -16,25 +18,65 @@
 - 📊 **Dashboard Analytics**: Real-time statistics and progress monitoring
 - 🎨 **Magical UI**: Beautiful, festive interface with smooth animations and transitions
 
-## 🛠️ Tech Stack
+## 🏗️ Architecture
 
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **Tailwind CSS** for styling with custom magical themes
-- **React Router** for navigation
-- **TanStack Query** for efficient data fetching
-- **Radix UI** components for accessible interfaces
-- **Lucide Icons** for beautiful iconography
+```
+SantaCloud/
+├── frontend/          # React TypeScript application
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── pages/         # Route components
+│   │   ├── services/      # API service layer
+│   │   ├── hooks/         # Custom React hooks
+│   │   └── lib/           # Utilities and configurations
+│   └── public/            # Static assets
+└── backend/           # AWS CDK infrastructure
+    ├── lambda/            # Lambda function handlers
+    ├── lib/               # CDK stack definitions
+    └── bin/               # CDK app entry point
+```
 
-### Backend
-- **AWS CDK** for infrastructure as code
-- **AWS Lambda** for serverless functions
-- **API Gateway** for REST API management
-- **DynamoDB** for NoSQL data storage
-- **TypeScript** throughout the stack
+### Architecture Diagram
 
-## 📋 Prerequisites
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React App     │    │   API Gateway   │    │   AWS Lambda    │
+│   (Frontend)    │◄──►│   (REST API)    │◄──►│   Functions     │
+│                 │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  DynamoDB       │    │  DynamoDB       │    │  DynamoDB       │
+│  Children       │    │  Gifts          │    │  Reindeers      │
+│  Table          │    │  Table          │    │  Table          │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### AWS Services Used :
+
+✅ **API Gateway** - REST API with CORS enabled
+✅ **AWS Lambda** - Serverless functions for each API endpoint
+✅ **DynamoDB** - NoSQL data storage for children, gifts, reindeers, and letters
+✅ **CloudFormation** - Infrastructure as code via CDK
+✅ **IAM** - Access management and permissions
+
+## 💰 Project Cost
+
+**Estimated total : $15-25/mois**
+
+Details :
+
+- **API Gateway** : $3.50/month (1 million requests)
+- **AWS Lambda** : $2.50/month (1 million requests)
+- **DynamoDB** : $8-18/month (depending on storage and throughput)
+- **CloudFormation** : $0 (free for CDK deployments)
+
+*Note: Costs are estimates for light to moderate usage. Actual costs may vary based on traffic and data volume.*
+
+## 🚀 Deployement
+
+### Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -43,22 +85,22 @@ Before you begin, ensure you have the following installed:
 - **AWS CDK CLI** (`npm install -g aws-cdk`)
 - **Git** for version control
 
-## 🚀 Installation & Setup
+### Deployment Instructions
 
-### 1. Clone the Repository
+#### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/MaxPrime7097/santa-s-command-center.git
 cd santa-s-command-center
 ```
 
-### 2. Install Frontend Dependencies
+#### 2. Install Frontend Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Deploy the Backend
+#### 3. Deploy the Backend
 
 ```bash
 cd backend
@@ -67,9 +109,7 @@ cdk bootstrap  # First time only
 cdk deploy
 ```
 
-Note the **API Gateway URL** from the deployment output (e.g., `https://abc123.execute-api.us-east-1.amazonaws.com/prod`).
-
-### 4. Configure Frontend API
+#### 4. Configure Frontend API
 
 Update the API base URL in `src/services/api.ts`:
 
@@ -77,7 +117,7 @@ Update the API base URL in `src/services/api.ts`:
 const API_BASE = 'https://your-api-id.execute-api.region.amazonaws.com/prod';
 ```
 
-### 5. Populate Initial Data
+#### 5. Populate Initial Data
 
 After deployment, add sample data to DynamoDB tables using AWS Console or CLI. See the [Backend README](./backend/README.md#populate-initial-data) for detailed instructions.
 
@@ -104,30 +144,23 @@ npm run preview
 npm run lint
 ```
 
-## 🏗️ Architecture
+## 🛠️ Tech Stack
 
-```
-SantaCloud/
-├── frontend/          # React TypeScript application
-│   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── pages/         # Route components
-│   │   ├── services/      # API service layer
-│   │   ├── hooks/         # Custom React hooks
-│   │   └── lib/           # Utilities and configurations
-│   └── public/            # Static assets
-└── backend/           # AWS CDK infrastructure
-    ├── lambda/            # Lambda function handlers
-    ├── lib/               # CDK stack definitions
-    └── bin/               # CDK app entry point
-```
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for fast development and building
+- **Tailwind CSS** for styling with custom magical themes
+- **React Router** for navigation
+- **TanStack Query** for efficient data fetching
+- **Radix UI** components for accessible interfaces
+- **Lucide Icons** for beautiful iconography
 
-### Database Schema
-
-- **SantaChildren**: Child information, wishlists, nice scores
-- **SantaGifts**: Gift manufacturing status and priorities
-- **SantaReindeers**: Reindeer health, location, and energy levels
-- **SantaLetters**: Children's letters and magical replies
+### Backend
+- **AWS CDK** for infrastructure as code
+- **AWS Lambda** for serverless functions
+- **API Gateway** for REST API management
+- **DynamoDB** for NoSQL data storage
+- **TypeScript** throughout the stack
 
 ## 📡 API Endpoints
 
@@ -174,21 +207,6 @@ src/
 2. Add routes in `src/App.tsx`
 3. Implement API calls in `src/services/api.ts`
 4. Update backend Lambda functions as needed
-
-### Future Improvements
-
--Authentication (Cognito)
--Role-based access (Elves / Santa / Admin)
--Real-time updates (WebSockets)
--AI-generated letter replies ✨
--Delivery tracking map
-
-### Code Style
-
-- Use TypeScript for all new code
-- Follow ESLint configuration
-- Use meaningful commit messages
-- Test your changes thoroughly
 
 ## 📄 License
 
